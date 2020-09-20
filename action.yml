@@ -1,10 +1,10 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'hatena entry poster'
+description: 'post entry to hatena blog'
+author: 'Makoto Nakagawa'
 inputs:
   milliseconds: # change this
     required: true
-    description: 'input description here'
+    description: 'this is test input.'
     default: 'default value if applicable'
 runs:
   using: 'node12'
