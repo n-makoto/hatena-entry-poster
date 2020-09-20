@@ -5131,9 +5131,12 @@ function run() {
         try {
             const ms = core.getInput('milliseconds');
             core.debug(`Waiting ${ms} milliseconds ...`); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
-            const API_KEY = core.getInput('API_KEY');
-            const BLOG_ID = core.getInput('BLOG_ID');
-            const HATENA_ID = core.getInput('HATENA_ID');
+            const API_KEY = process.env.API_KEY || '';
+            const BLOG_ID = process.env.BLOG_ID || '';
+            const HATENA_ID = process.env.HATENA_ID || '';
+            core.debug(API_KEY);
+            core.debug(BLOG_ID);
+            core.debug(HATENA_ID);
             core.debug(new Date().toTimeString());
             yield wait_1.wait(parseInt(ms, 10));
             core.debug(new Date().toTimeString());

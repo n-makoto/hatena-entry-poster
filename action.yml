@@ -6,15 +6,6 @@ inputs:
     required: true
     description: 'this is test input.'
     default: 'default value if applicable'
-  API_KEY:
-    required: true
-    description: 'hatena blog api key.'
-  HATENA_ID:
-    required: true
-    description: 'hatena blog user id.'
-  BLOG_ID:
-    required: true
-    description: 'hatena blog id (domain).'
 runs:
   using: 'node12'
   main: 'dist/index.js'

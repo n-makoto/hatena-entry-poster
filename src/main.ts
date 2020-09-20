@@ -7,9 +7,12 @@ async function run(): Promise<void> {
     const ms: string = core.getInput('milliseconds')
     core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
 
-    const API_KEY: string = core.getInput('API_KEY')
-    const BLOG_ID: string = core.getInput('BLOG_ID')
-    const HATENA_ID: string = core.getInput('HATENA_ID')
+    const API_KEY: string = process.env.API_KEY || ''
+    const BLOG_ID: string = process.env.BLOG_ID || ''
+    const HATENA_ID: string = process.env.HATENA_ID || ''
+    core.debug(API_KEY)
+    core.debug(BLOG_ID)
+    core.debug(HATENA_ID)
 
     core.debug(new Date().toTimeString())
     await wait(parseInt(ms, 10))
