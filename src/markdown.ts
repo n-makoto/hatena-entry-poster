@@ -18,11 +18,7 @@ export const getTitleAndContent = (directory: string): Entry => {
   const {parse} = remark()
   const parsedMarkDown = parse(file)
   const h1Node = findH1(parsedMarkDown, 'heading', 1)[0]
-  if (
-    Array.isArray(h1Node) &&
-    h1Node.children &&
-    Array.isArray(h1Node.children)
-  ) {
+  if (h1Node.children && Array.isArray(h1Node.children)) {
     const titleNode = findNode(h1Node.children[0], 'text')
     if (titleNode[0].value) {
       title = titleNode[0].value
