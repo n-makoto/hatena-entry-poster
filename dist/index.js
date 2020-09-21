@@ -38746,8 +38746,9 @@ const postEntry = ({ API_KEY, BLOG_ID, HATENA_ID, title, content }) => __awaiter
     // await client.list()
     yield client.create({
         categories: ['category1'],
-        content,
-        contentType: 'text/x-markdown',
+        content: '<h1>見出し１</h1><p>こんにちは。<strong>ここは太字！</strong></p><p>改行されてますか？</p>',
+        contentType: 'text/html',
+        // contentType: 'text/x-markdown',
         draft: true,
         title
     });
