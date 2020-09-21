@@ -6254,6 +6254,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(186));
 const postEntry_1 = __webpack_require__(803);
+// import {uploadImage} from './uploadImage'
 const entry_1 = __webpack_require__(253);
 const wait_1 = __webpack_require__(817);
 function run() {
@@ -6261,18 +6262,11 @@ function run() {
         try {
             const ms = core.getInput('milliseconds');
             core.debug(`Waiting ${ms} milliseconds ...`); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
-            const API_KEY = process.env.API_KEY || '';
-            const BLOG_ID = process.env.BLOG_ID || '';
-            const HATENA_ID = process.env.HATENA_ID || '';
-            const FILE_PATH = process.env.FILE_PATH || '';
-            core.debug(API_KEY);
-            core.debug(BLOG_ID);
-            core.debug(HATENA_ID);
             core.debug(new Date().toTimeString());
             yield wait_1.wait(parseInt(ms, 10));
             core.debug(new Date().toTimeString());
             const { title, content } = entry_1.getLatestEntry();
-            yield postEntry_1.postEntry({ API_KEY, BLOG_ID, HATENA_ID, title, content });
+            yield postEntry_1.postEntry({ title, content });
             // await uploadImage({
             //   API_KEY,
             //   HATENA_ID,
@@ -11311,76 +11305,26 @@ exports.getLatestEntry = void 0;
 /* eslint-disable no-console */
 const fs_1 = __importDefault(__webpack_require__(747));
 const path_1 = __importDefault(__webpack_require__(622));
-const remark_1 = __importDefault(__webpack_require__(81));
-const ENTRIES_PATH = './entries';
+const markdown_1 = __webpack_require__(821);
+const utils_1 = __webpack_require__(918);
+const settings_1 = __webpack_require__(286);
 exports.getLatestEntry = () => {
     try {
-        const list = fs_1.default.readdirSync(ENTRIES_PATH);
+        const list = fs_1.default.readdirSync(settings_1.ENTRIES_PATH);
         const directories = filterToDirectories(list);
         const latestDirectory = getLatestDirectoryName(directories);
-        return getTitleAndContent(latestDirectory);
+        return markdown_1.getTitleAndContent(latestDirectory);
     }
     catch (err) {
         console.error(err);
         process.exit(1);
     }
 };
-const getTitleAndContent = (directory) => {
-    let title = '';
-    const directoryPath = `${ENTRIES_PATH}/${directory}`;
-    const list = fs_1.default.readdirSync(directoryPath);
-    if (!list.includes('entry.md')) {
-        throw new Error('entry.md is not found');
-    }
-    const filePath = `${directoryPath}/entry.md`;
-    const file = fs_1.default.readFileSync(filePath, { encoding: 'utf8' });
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { parse } = remark_1.default();
-    const parsedMarkDown = parse(file);
-    const h1Node = findVal(parsedMarkDown, 'heading', 1);
-    if (Array.isArray(h1Node) &&
-        h1Node[0].children &&
-        Array.isArray(h1Node[0].children)) {
-        const titleNode = findVal(h1Node[0].children[0], 'text', undefined);
-        if (titleNode[0].value) {
-            title = titleNode[0].value;
-        }
-    }
-    return {
-        title,
-        content: file
-    };
-};
-const findVal = (object, targetType, depth) => {
-    const result = [];
-    for (const k in object) {
-        const value = object[k];
-        if (k === 'type' && value && value === targetType) {
-            if (typeof depth === 'number' && object.depth && object.depth === depth) {
-                result.push(object);
-                break;
-            }
-            else {
-                result.push(object);
-            }
-        }
-        if (value && typeof value === 'object') {
-            const innerValue = findVal(value, targetType, depth);
-            if (innerValue.length > 0) {
-                for (const elem of innerValue) {
-                    if (typeof depth === 'number' && elem.depth) {
-                        if (elem.depth === depth) {
-                            result.push(elem);
-                        }
-                    }
-                    else {
-                        result.push(elem);
-                    }
-                }
-            }
-        }
-    }
-    return result;
+const filterToDirectories = (list) => {
+    return list.filter(elem => {
+        const stats = fs_1.default.statSync(path_1.default.join(settings_1.ENTRIES_PATH, elem));
+        return stats.isDirectory();
+    });
 };
 const getLatestDirectoryName = (list) => {
     const latestDirectory = {
@@ -11388,7 +11332,7 @@ const getLatestDirectoryName = (list) => {
         time: 0
     };
     for (const elem of list) {
-        const dateStr = extractDateString(elem);
+        const dateStr = utils_1.extractDateString(elem);
         const elemDate = new Date(`${dateStr.join('-')} 00:00:00`);
         const epochTime = elemDate.getTime();
         if (epochTime > latestDirectory.time) {
@@ -11398,23 +11342,6 @@ const getLatestDirectoryName = (list) => {
     }
     return latestDirectory.name;
 };
-// TODO: テスト書く
-const extractDateString = (str) => {
-    const regExp = /([0-9]{4})([0-9]{2})([0-9]{2})/g;
-    const result = regExp.exec(str);
-    if (result == null || result.length === 0) {
-        throw new Error('Invalid Directory Name');
-    }
-    return [result[1], result[2], result[3]] || false;
-};
-const filterToDirectories = (list) => {
-    return list.filter(elem => {
-        const stats = fs_1.default.statSync(path_1.default.join(ENTRIES_PATH, elem));
-        return stats.isDirectory();
-    });
-};
-const result = exports.getLatestEntry();
-console.log(result);
 
 
 /***/ }),
@@ -13069,7 +12996,21 @@ function autoLink(eat, value, silent) {
 /* 283 */,
 /* 284 */,
 /* 285 */,
-/* 286 */,
+/* 286 */
+/***/ (function(__unusedmodule, exports) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ENTRIES_PATH = exports.FILE_PATH = exports.HATENA_ID = exports.BLOG_ID = exports.API_KEY = void 0;
+exports.API_KEY = process.env.API_KEY || '';
+exports.BLOG_ID = process.env.BLOG_ID || '';
+exports.HATENA_ID = process.env.HATENA_ID || '';
+exports.FILE_PATH = process.env.FILE_PATH || '';
+exports.ENTRIES_PATH = './entries';
+
+
+/***/ }),
 /* 287 */
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
@@ -38736,19 +38677,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.postEntry = void 0;
 const hatena_blog_api_1 = __webpack_require__(442);
-const postEntry = ({ API_KEY, BLOG_ID, HATENA_ID, title, content }) => __awaiter(void 0, void 0, void 0, function* () {
+const settings_1 = __webpack_require__(286);
+const postEntry = ({ title, content }) => __awaiter(void 0, void 0, void 0, function* () {
     const client = new hatena_blog_api_1.Client({
-        apiKey: API_KEY,
+        apiKey: settings_1.API_KEY,
         authType: 'basic',
-        blogId: BLOG_ID,
-        hatenaId: HATENA_ID
+        blogId: settings_1.BLOG_ID,
+        hatenaId: settings_1.HATENA_ID
     });
-    // await client.list()
     yield client.create({
         categories: ['category1'],
-        content: '<h1>見出し１</h1><p>こんにちは。<strong>ここは太字！</strong></p><p>改行されてますか？</p>',
-        contentType: 'text/html',
-        // contentType: 'text/x-markdown',
+        content,
+        contentType: 'text/x-markdown',
         draft: true,
         title
     });
@@ -39837,7 +39777,89 @@ exports.Redirect = Redirect
 
 /***/ }),
 /* 820 */,
-/* 821 */,
+/* 821 */
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.findH1 = exports.findNode = exports.getTitleAndContent = void 0;
+const fs_1 = __importDefault(__webpack_require__(747));
+const remark_1 = __importDefault(__webpack_require__(81));
+const settings_1 = __webpack_require__(286);
+exports.getTitleAndContent = (directory) => {
+    let title = '';
+    const directoryPath = `${settings_1.ENTRIES_PATH}/${directory}`;
+    const list = fs_1.default.readdirSync(directoryPath);
+    if (!list.includes('entry.md')) {
+        throw new Error('entry.md is not found');
+    }
+    const filePath = `${directoryPath}/entry.md`;
+    const file = fs_1.default.readFileSync(filePath, { encoding: 'utf8' });
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    const { parse } = remark_1.default();
+    const parsedMarkDown = parse(file);
+    const h1Node = exports.findH1(parsedMarkDown, 'heading', 1)[0];
+    if (Array.isArray(h1Node) &&
+        h1Node.children &&
+        Array.isArray(h1Node.children)) {
+        const titleNode = exports.findNode(h1Node.children[0], 'text');
+        if (titleNode[0].value) {
+            title = titleNode[0].value;
+        }
+    }
+    return {
+        title,
+        content: file
+    };
+};
+exports.findNode = (object, targetType) => {
+    const result = [];
+    for (const k in object) {
+        const value = object[k];
+        if (k === 'type' && value && value === targetType) {
+            result.push(object);
+        }
+        if (value && typeof value === 'object') {
+            const innerValue = exports.findNode(value, targetType);
+            if (innerValue.length > 0) {
+                for (const elem of innerValue) {
+                    result.push(elem);
+                }
+            }
+        }
+    }
+    return result;
+};
+exports.findH1 = (object, targetType, depth) => {
+    const result = [];
+    for (const k in object) {
+        const value = object[k];
+        if (k === 'type' && value && value === targetType) {
+            if (typeof depth === 'number' && object.depth && object.depth === depth) {
+                result.push(object);
+                break;
+            }
+        }
+        if (value && typeof value === 'object') {
+            const innerValue = exports.findH1(value, targetType, depth);
+            if (innerValue.length > 0) {
+                for (const elem of innerValue) {
+                    if (typeof depth === 'number' && elem.depth && elem.depth === depth) {
+                        result.push(elem);
+                    }
+                }
+            }
+        }
+    }
+    return result;
+};
+
+
+/***/ }),
 /* 822 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -42411,7 +42433,25 @@ function text(eat, value, silent) {
 
 /***/ }),
 /* 917 */,
-/* 918 */,
+/* 918 */
+/***/ (function(__unusedmodule, exports) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.extractDateString = void 0;
+// TODO: テスト書く
+exports.extractDateString = (str) => {
+    const regExp = /([0-9]{4})([0-9]{2})([0-9]{2})/g;
+    const result = regExp.exec(str);
+    if (result == null || result.length === 0) {
+        throw new Error('Invalid Directory Name');
+    }
+    return [result[1], result[2], result[3]] || false;
+};
+
+
+/***/ }),
 /* 919 */
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
