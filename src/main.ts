@@ -1,6 +1,7 @@
 import * as core from '@actions/core'
 import {postEntry} from './postEntry'
 import {uploadImage} from './uploadImage'
+import {getLatestEntry} from './entry'
 import {wait} from './wait'
 
 async function run(): Promise<void> {
@@ -20,24 +21,16 @@ async function run(): Promise<void> {
     await wait(parseInt(ms, 10))
     core.debug(new Date().toTimeString())
 
-    const title = 'test title.'
+    const {title, content} = getLatestEntry()
 
-    // const content = [
-    //   '[link](http://example.com)',
-    //   '',
-    //   '- item 1',
-    //   '- item 2',
-    //   '- item 3'
-    // ].join('\n')
+    await postEntry({API_KEY, BLOG_ID, HATENA_ID, title, content})
 
-    // await postEntry({API_KEY, BLOG_ID, HATENA_ID, title, content})
-
-    await uploadImage({
-      API_KEY,
-      HATENA_ID,
-      title,
-      file: FILE_PATH
-    })
+    // await uploadImage({
+    //   API_KEY,
+    //   HATENA_ID,
+    //   title,
+    //   file: FILE_PATH
+    // })
 
     core.setOutput('time', new Date().toTimeString())
   } catch (error) {

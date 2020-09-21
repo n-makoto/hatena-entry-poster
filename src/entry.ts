@@ -16,7 +16,7 @@ type Entry = {
   content: string
 }
 
-const getLatestEntry = (): Entry => {
+export const getLatestEntry = (): Entry => {
   try {
     const list = fs.readdirSync(ENTRIES_PATH)
     const directories = filterToDirectories(list)
@@ -56,7 +56,7 @@ const getTitleAndContent = (directory: string): Entry => {
 
   return {
     title,
-    content: directory
+    content: file
   }
 }
 
