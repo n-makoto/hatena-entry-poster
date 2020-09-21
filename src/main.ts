@@ -11,6 +11,7 @@ async function run(): Promise<void> {
     const API_KEY: string = process.env.API_KEY || ''
     const BLOG_ID: string = process.env.BLOG_ID || ''
     const HATENA_ID: string = process.env.HATENA_ID || ''
+    const FILE_PATH: string = process.env.FILE_PATH || ''
     core.debug(API_KEY)
     core.debug(BLOG_ID)
     core.debug(HATENA_ID)
@@ -35,7 +36,7 @@ async function run(): Promise<void> {
       API_KEY,
       HATENA_ID,
       title,
-      file: './sample.png'
+      file: FILE_PATH
     })
 
     core.setOutput('time', new Date().toTimeString())
