@@ -19,7 +19,7 @@ const postEntry = async ({
     blogId: BLOG_ID,
     hatenaId: HATENA_ID
   })
-  await client.list()
+  // await client.list()
 
   await client.create({
     categories: ['category1'],

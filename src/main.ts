@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import {postEntry} from './postEntry'
+import {uploadImage} from './uploadImage'
 import {wait} from './wait'
 
 async function run(): Promise<void> {
@@ -20,15 +21,22 @@ async function run(): Promise<void> {
 
     const title = 'test title.'
 
-    const content = [
-      '[link](http://example.com)',
-      '',
-      '- item 1',
-      '- item 2',
-      '- item 3'
-    ].join('\n')
+    // const content = [
+    //   '[link](http://example.com)',
+    //   '',
+    //   '- item 1',
+    //   '- item 2',
+    //   '- item 3'
+    // ].join('\n')
 
-    await postEntry({API_KEY, BLOG_ID, HATENA_ID, title, content})
+    // await postEntry({API_KEY, BLOG_ID, HATENA_ID, title, content})
+
+    await uploadImage({
+      API_KEY,
+      HATENA_ID,
+      title,
+      file: './sample.png'
+    })
 
     core.setOutput('time', new Date().toTimeString())
   } catch (error) {
