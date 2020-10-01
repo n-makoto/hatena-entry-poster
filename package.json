@@ -25,7 +25,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.2.5",
+    "@actions/core": "^1.2.6",
     "@types/marked": "^1.1.0",
     "@types/unist": "^2.0.3",
     "hatena-blog-api": "^2.0.2",
