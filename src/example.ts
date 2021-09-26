@@ -3,9 +3,9 @@ import {Client} from 'hatena-blog-api'
 
 // tslint:disable:no-console
 const main = async (): Promise<void> => {
-  const apiKey = 'z9rvpt2v20'
-  const blogId = 'action-test.hatenablog.com'
-  const hatenaId = 'mkt0225'
+  const apiKey = 'xxx'
+  const blogId = 'foo.hatenablog.com'
+  const hatenaId = 'bar'
 
   const client = new Client({
     apiKey,
